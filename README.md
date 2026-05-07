@@ -20,10 +20,10 @@ This repository has two main components:
 source venv/bin/activate
 
 # Track ArUco markers from a video file with GoPro Hero 13 calibration
-python3 aruco.py /path/to/video.mp4 --calib gopro13_5.3k.calib
+python3 tracker.py /path/to/video.mp4 --calib gopro13_5.3k.calib
 
 # Track from a live camera (device 0)
-python3 aruco.py 0 --calib gopro13_5.3k.calib --marker-lengths 1=0.06,13=0.06,42=0.06
+python3 tracker.py 0 --calib gopro13_5.3k.calib --marker-lengths 1=0.06,13=0.06,42=0.06
 
 # Generate printable ArUco markers
 python3 aruco_printout.py
@@ -31,7 +31,7 @@ python3 aruco_printout.py
 
 ## Python Tracking Scripts
 
-### `aruco.py` -- Main Tracker
+### `tracker.py` -- Main Tracker
 
 All-in-one marker tracker that processes video frames, detects ArUco markers and QR codes, estimates 6DoF pose, and produces both an annotated video and a CSV file.
 
@@ -47,7 +47,7 @@ All-in-one marker tracker that processes video frames, detects ArUco markers and
 **Usage:**
 
 ```bash
-python3 aruco.py <video_source> [options]
+python3 tracker.py <video_source> [options]
 ```
 
 `<video_source>` is a video file path or a camera index (e.g., `0`).
@@ -138,7 +138,7 @@ python3 aruco_printout.py
 
 Edit the script to change marker IDs (default: 10-15) and dictionary (default: `DICT_6X6_250`).
 
-### `aruco_from_directory.py` -- Batch PNM Processor
+### `tracker_from_directory.py` -- Batch PNM Processor
 
 Processes `.pnm` image files from a directory for ArUco marker detection. Writes annotated output as `*_out.pnm` files. Uses hardcoded approximate camera intrinsics.
 
@@ -153,14 +153,14 @@ Creates a Python 3 virtual environment and installs dependencies (`opencv-contri
 source venv/bin/activate
 ```
 
-#### `aruco_dir.sh` -- Batch Video Processing
+#### `tracker_dir.sh` -- Batch Video Processing
 
-Runs `aruco.py` on every video file in a directory recursively.
+Runs `tracker.py` on every video file in a directory recursively.
 
 ```bash
-./aruco_dir.sh <directory> <extension>
+./tracker_dir.sh <directory> <extension>
 # Example:
-./aruco_dir.sh /path/to/videos mp4
+./tracker_dir.sh /path/to/videos mp4
 ```
 
 Processes each file with predefined marker lengths (IDs 4, 5, 10-15).
@@ -300,7 +300,7 @@ make
 
 ```bash
 cd ..
-python3 aruco.py recording.mp4 \
+python3 tracker.py recording.mp4 \
   --calib gopro13_5.3k.calib \
   --marker-lengths 10=0.06,11=0.06,12=0.06,13=0.06,14=0.06,15=0.06
 ```
@@ -319,25 +319,24 @@ python3 plot_csv.py recording.csv --headless --save_mp4 recording-plot.mp4
 
 **C (libQRSync.c):** `libx11-dev`, `libxrandr-dev`, `libqrencode-dev`
 
-**Shell:** `ffmpeg` (used by `aruco.py` to encode output video), `qrencode` (used by `makeqrcode.sh`)
+**Shell:** `ffmpeg` (used by `tracker.py` to encode output video), `qrencode` (used by `makeqrcode.sh`)
 
 ## File Structure
 
 ```
 tracking/
-├── aruco.py                  # Main ArUco + QR tracker
-├── aruco_from_directory.py   # Batch PNM processor
+├── tracker.py                  # Main ArUco + QR tracker
+├── tracker_from_directory.py   # Batch PNM processor
 ├── aruco_printout.py         # Printable marker PDF generator
 ├── plot_csv.py               # 3D trajectory visualization
 ├── setup.sh                  # Python venv setup
-├── aruco_dir.sh              # Batch video processing
+├── tracker_dir.sh              # Batch video processing
 ├── plot_dir.sh               # Batch CSV plotting
 ├── gopro13_5.3k.calib        # GoPro Hero 13 calibration
 ├── gopro4_2.7k.calib         # GoPro Hero 4 calibration
 ├── aruco_markers_png/        # Generated marker PNGs
-├── aruco2.pdf                # Printable marker sheet
 ├── marker_*.png              # Individual marker images
-└── synchronization/ -> ../../c/synchronization/  # Symlink to C sync tools
+└── synchronization/          # C sync tools
     ├── xQRSync.c             # Standalone X11 QR display (embedded QR gen)
     ├── libQRSync.c           # libqrencode-based QR display (dynamic Hz, tiling)
     ├── sync.html             # Browser-based QR display
