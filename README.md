@@ -347,6 +347,19 @@ python3 plot_csv.py recording.csv --headless --save_mp4 recording-plot.mp4
 
 **Shell:** `ffmpeg` (used by `tracker.py` to encode output video), `qrencode` (used by `makeqrcode.sh`)
 
+## Body Pose Estimation for Learning by Demonstration
+
+To capture full 3D body pose as part of a learning-by-demonstration recording, use the [magician_body_pose_estimation](https://github.com/magician-project/magician_body_pose_estimation) repository alongside this pipeline.
+
+Run `scripts/bodyPoseEstimationToCSV.sh` on each recorded video to extract per-frame skeleton data:
+
+```bash
+bash scripts/bodyPoseEstimationToCSV.sh /path/to/recording.mp4
+# Produces: /path/to/recording.mp4_3DBody.csv
+```
+
+The output CSV contains one row per detected skeleton per frame, with `frame_id`, `skeleton_id`, and `x/y/z` coordinates for every body, hand, and face joint. These `frame_id` values align with the `frame_id` column in the ArUco/QR tracking CSV produced by `tracker.py`, so both files can be joined on `frame_id` for a synchronized multimodal dataset (camera pose + body pose + optional force/torque).
+
 ## File Structure
 
 ```
